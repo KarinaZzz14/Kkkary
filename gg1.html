@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточки животных</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Навигация -->
+        <div class="nav-bar">
+            <div class="logo">🐘 ЗооАкадемия</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-btn">🏠 Главная</a>
+                <a href="cards.html" class="nav-btn active">📇 Карточки</a>
+                <a href="quiz.html" class="nav-btn">❓ Угадайка</a>
+                <a href="writer.html" class="nav-btn">✍️ Писатель</a>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="page-header">
+            <h1>📇 Карточки животных</h1>
+            <p>Нажимай на карточки, чтобы отметить изученные</p>
+        </div>
+
+        <!-- Карточки -->
+        <div class="cards-grid" id="cardsGrid"></div>
+
+        <!-- Кнопка сброса -->
+        <button class="reset-btn" id="resetCardsBtn">🔄 Сбросить прогресс</button>
+
+        <!-- Футер -->
+        <div class="footer">
+            <p>Всего животных: <span id="totalCount">20</span> · Изучено: <span id="studiedCount">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        // База животных
+        const animals = [
+            { emoji: '🐶', english: 'dog', russian: 'собака', sound: 'гав-гав' },
+            { emoji: '🐱', english: 'cat', russian: 'кошка', sound: 'мяу-мяу' },
+            { emoji: '🐭', english: 'mouse', russian: 'мышь', sound: 'пи-пи' },
+            { emoji: '🐹', english: 'hamster', russian: 'хомяк', sound: 'хрум-хрум' },
+            { emoji: '🐰', english: 'rabbit', russian: 'кролик', sound: '...' },
+            { emoji: '🦊', english: 'fox', russian: 'лиса', sound: 'тяф-тяф' },
+            { emoji: '🐻', english: 'bear', russian: 'медведь', sound: 'ррр' },
+            { emoji: '🐼', english: 'panda', russian: 'панда', sound: '...' },
+            { emoji: '🐨', english: 'koala', russian: 'коала', sound: 'хр-хр' },
+            { emoji: '🦁', english: 'lion', russian: 'лев', sound: 'рррр' },
+            { emoji: '🐮', english: 'cow', russian: 'корова', sound: 'му-у' },
+            { emoji: '🐷', english: 'pig', russian: 'свинья', sound: 'хрю-хрю' },
+            { emoji: '🐸', english: 'frog', russian: 'лягушка', sound: 'ква-ква' },
+            { emoji: '🐙', english: 'octopus', russian: 'осьминог', sound: '...' },
+            { emoji: '🦉', english: 'owl', russian: 'сова', sound: 'ух-ух' },
+            { emoji: '🐧', english: 'penguin', russian: 'пингвин', sound: '...' },
+            { emoji: '🦆', english: 'duck', russian: 'утка', sound: 'кря-кря' },
+            { emoji: '🦅', english: 'eagle', russian: 'орёл', sound: 'кланг' },
+            { emoji: '🐘', english: 'elephant', russian: 'слон', sound: 'тууу' },
+            { emoji: '🦒', english: 'giraffe', russian: 'жираф', sound: '...' }
+        ];
+
+        // Загружаем прогресс
+        let studied = JSON.parse(localStorage.getItem('studiedCards')) || new Array(animals.length).fill(false);
+
+        // Отрисовка карточек
+        function renderCards() {
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = '';
+            
+            animals.forEach((animal, index) => {
+                const card = document.createElement('div');
+                card.className = `study-card ${studied[index] ? 'studied' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="card-emoji">${animal.emoji}</div>
+                    <div class="card-english">${animal.english}</div>
+                    <div class="card-russian">${animal.russian}</div>
+                    <div class="card-sound">🔊 ${animal.sound}</div>
+                    <div class="card-status">${studied[index] ? '✅ Изучено' : '📝 Нажми изучить'}</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    studied[index] = !studied[index];
+                    localStorage.setItem('studiedCards', JSON.stringify(studied));
+                    renderCards();
+                    updateStats();
+                });
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            const studiedCount = studied.filter(v => v).length;
+            document.getElementById('studiedCount').textContent = studiedCount;
+        }
+
+        // Сброс
+        document.getElementById('resetCardsBtn').addEventListener('click', () => {
+            studied = new Array(animals.length).fill(false);
+            localStorage.setItem('studiedCards', JSON.stringify(studied));
+            renderCards();
+            updateStats();
+        });
+
+        // Инициализация
+        renderCards();
+        updateStats();
+    </script>
+</body>
+</html>

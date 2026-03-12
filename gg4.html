@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Напиши название</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Навигация -->
+        <div class="nav-bar">
+            <div class="logo">🐘 ЗооАкадемия</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-btn">🏠 Главная</a>
+                <a href="cards.html" class="nav-btn">📇 Карточки</a>
+                <a href="quiz.html" class="nav-btn">❓ Угадайка</a>
+                <a href="writer.html" class="nav-btn active">✍️ Писатель</a>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="page-header">
+            <h1>✍️ Напиши сам</h1>
+            <p>Введи название животного на английском</p>
+        </div>
+
+        <!-- Тренажёр -->
+        <div class="writer-container">
+            <div class="writer-emoji" id="writerEmoji">🐱</div>
+            
+            <input type="text" class="writer-input" id="writerInput" 
+                   placeholder="например: cat" autocomplete="off" autofocus>
+            
+            <button class="writer-check" id="writerCheckBtn">✅ Проверить</button>
+            
+            <div class="writer-feedback" id="writerFeedback">
+                👆 Введи ответ и нажми проверить
+            </div>
+            
+            <div class="writer-progress">
+                <span id="writerTotal">20</span> животных · 
+                Правильно: <span id="writerCorrect">0</span>
+            </div>
+            
+            <button class="writer-next" id="writerNextBtn">➡️ Следующее животное</button>
+        </div>
+
+        <!-- Футер -->
+        <div class="footer">
+            <p>Правильных ответов: <span id="footerCorrect">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        // База животных
+        const animals = [
+            { emoji: '🐶', english: 'dog', russian: 'собака' },
+            { emoji: '🐱', english: 'cat', russian: 'кошка' },
+            { emoji: '🐭', english: 'mouse', russian: 'мышь' },
+            { emoji: '🐹', english: 'hamster', russian: 'хомяк' },
+            { emoji: '🐰', english: 'rabbit', russian: 'кролик' },
+            { emoji: '🦊', english: 'fox', russian: 'лиса' },
+            { emoji: '🐻', english: 'bear', russian: 'медведь' },
+            { emoji: '🐼', english: 'panda', russian: 'панда' },
+            { emoji: '🐨', english: 'koala', russian: 'коала' },
+            { emoji: '🦁', english: 'lion', russian: 'лев' },
+            { emoji: '🐮', english: 'cow', russian: 'корова' },
+            { emoji: '🐷', english: 'pig', russian: 'свинья' },
+            { emoji: '🐸', english: 'frog', russian: 'лягушка' },
+            { emoji: '🐙', english: 'octopus', russian: 'осьминог' },
+            { emoji: '🦉', english: 'owl', russian: 'сова' },
+            { emoji: '🐧', english: 'penguin', russian: 'пингвин' },
+            { emoji: '🦆', english: 'duck', russian: 'утка' },
+            { emoji: '🦅', english: 'eagle', russian: 'орёл' },
+            { emoji: '🐘', english: 'elephant', russian: 'слон' },
+            { emoji: '🦒', english: 'english', russian: 'жираф' }
+        ];
+
+        // Состояние
+        let currentIndex = 0;
+        let correctCount = 0;
+
+        // Загружаем прогресс
+        correctCount = parseInt(localStorage.getItem('writerCorrect')) || 0;
+        updateCorrectDisplay();
+
+        // Новое животное
+        function newAnimal() {
+            currentIndex = Math.floor(Math.random() * animals.length);
+            document.getElementById('writerEmoji').textContent = animals[currentIndex].emoji;
+            document.getElementById('writerInput').value = '';
+            document.getElementById('writerFeedback').textContent = '👆 Введи ответ и нажми проверить';
+            document.getElementById('writerFeedback').className = 'writer-feedback';
+            document.getElementById('writerInput').focus();
+        }
+
+        // Проверка
+        function checkAnswer() {
+            const input = document.getElementById('writerInput');
+            const feedback = document.getElementById('writerFeedback');
+            const answer = input.value.trim().toLowerCase();
+            const correct = animals[currentIndex].english;
+            
+            if (answer === '') {
+                feedback.textContent = '❓ Введи ответ!';
+                feedback.className = 'writer-feedback wrong';
+                return;
+            }
+            
+            if (answer === correct) {
+                feedback.textContent = '✅ Абсолютно верно! Молодец!';
+                feedback.className = 'writer-feedback correct';
+                correctCount++;
+                localStorage.setItem('writerCorrect', correctCount);
+                updateCorrectDisplay();
+            } else {
+                feedback.textContent = `❌ Неправильно. Правильный ответ: ${correct}`;
+                feedback.className = 'writer-feedback wrong';
+            }
+        }
+
+        // Обновление счётчика
+        function updateCorrectDisplay() {
+            document.getElementById('writerCorrect').textContent = correctCount;
+            document.getElementById('footerCorrect').textContent = correctCount;
+        }
+
+        // События
+        document.getElementById('writerCheckBtn').addEventListener('click', checkAnswer);
+        document.getElementById('writerNextBtn').addEventListener('click', newAnimal);
+        
+        document.getElementById('writerInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Старт
+        newAnimal();
+    </script>
+</body>
+</html>

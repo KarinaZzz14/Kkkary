@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Угадай животное</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Навигация -->
+        <div class="nav-bar">
+            <div class="logo">🐘 ЗооАкадемия</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-btn">🏠 Главная</a>
+                <a href="cards.html" class="nav-btn">📇 Карточки</a>
+                <a href="quiz.html" class="nav-btn active">❓ Угадайка</a>
+                <a href="writer.html" class="nav-btn">✍️ Писатель</a>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="page-header">
+            <h1>❓ Угадай животное</h1>
+            <p>Выбери правильный перевод</p>
+        </div>
+
+        <!-- Игра -->
+        <div class="quiz-container">
+            <div class="quiz-question" id="quizQuestion">Кто это?</div>
+            <div class="quiz-emoji" id="quizEmoji">🐶</div>
+            
+            <div class="quiz-options" id="quizOptions"></div>
+            
+            <div class="quiz-stats">
+                <div class="quiz-score" id="quizScore">Счёт: 0</div>
+                <div class="quiz-total" id="quizTotal">Из 20</div>
+            </div>
+            
+            <div class="quiz-buttons">
+                <button class="quiz-next" id="quizNextBtn">➡️ Следующий</button>
+                <button class="quiz-reset" id="quizResetBtn">🔄 Сброс счёта</button>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <div class="footer">
+            <p>Правильных ответов: <span id="correctCount">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        // База животных
+        const animals = [
+            { emoji: '🐶', english: 'dog', russian: 'собака' },
+            { emoji: '🐱', english: 'cat', russian: 'кошка' },
+            { emoji: '🐭', english: 'mouse', russian: 'мышь' },
+            { emoji: '🐹', english: 'hamster', russian: 'хомяк' },
+            { emoji: '🐰', english: 'rabbit', russian: 'кролик' },
+            { emoji: '🦊', english: 'fox', russian: 'лиса' },
+            { emoji: '🐻', english: 'bear', russian: 'медведь' },
+            { emoji: '🐼', english: 'panda', russian: 'панда' },
+            { emoji: '🐨', english: 'koala', russian: 'коала' },
+            { emoji: '🦁', english: 'lion', russian: 'лев' },
+            { emoji: '🐮', english: 'cow', russian: 'корова' },
+            { emoji: '🐷', english: 'pig', russian: 'свинья' },
+            { emoji: '🐸', english: 'frog', russian: 'лягушка' },
+            { emoji: '🐙', english: 'octopus', russian: 'осьминог' },
+            { emoji: '🦉', english: 'owl', russian: 'сова' },
+            { emoji: '🐧', english: 'penguin', russian: 'пингвин' },
+            { emoji: '🦆', english: 'duck', russian: 'утка' },
+            { emoji: '🦅', english: 'eagle', russian: 'орёл' },
+            { emoji: '🐘', english: 'elephant', russian: 'слон' },
+            { emoji: '🦒', english: 'giraffe', russian: 'жираф' }
+        ];
+
+        // Состояние
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        // Загружаем счёт
+        score = parseInt(localStorage.getItem('quizScore')) || 0;
+        document.getElementById('quizScore').textContent = `Счёт: ${score}`;
+        document.getElementById('correctCount').textContent = score;
+
+        // Новая задача
+        function newQuestion() {
+            currentIndex = Math.floor(Math.random() * animals.length);
+            const animal = animals[currentIndex];
+            
+            document.getElementById('quizEmoji').textContent = animal.emoji;
+            document.getElementById('quizQuestion').textContent = `Как будет "${animal.russian}" по-английски?`;
+            
+            // Варианты ответов
+            const options = [animal.english];
+            while (options.length < 4) {
+                const randomAnimal = animals[Math.floor(Math.random() * animals.length)].english;
+                if (!options.includes(randomAnimal)) {
+                    options.push(randomAnimal);
+                }
+            }
+            
+            // Перемешиваем
+            options.sort(() => Math.random() - 0.5);
+            
+            const optionsDiv = document.getElementById('quizOptions');
+            optionsDiv.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(btn, opt === animal.english);
+                optionsDiv.appendChild(btn);
+            });
+            
+            answered = false;
+        }
+
+        // Проверка
+        function checkAnswer(btn, isCorrect) {
+            if (answered) return;
+            
+            answered = true;
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+                score++;
+                localStorage.setItem('quizScore', score);
+            } else {
+                btn.classList.add('wrong');
+                // Показываем правильный ответ
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    if (opt.textContent === animals[currentIndex].english) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            document.getElementById('quizScore').textContent = `Счёт: ${score}`;
+            document.getElementById('correctCount').textContent = score;
+        }
+
+        // Следующий вопрос
+        document.getElementById('quizNextBtn').addEventListener('click', newQuestion);
+
+        // Сброс
+        document.getElementById('quizResetBtn').addEventListener('click', () => {
+            score = 0;
+            localStorage.setItem('quizScore', score);
+            document.getElementById('quizScore').textContent = `Счёт: 0`;
+            document.getElementById('correctCount').textContent = '0';
+            newQuestion();
+        });
+
+        // Старт
+        newQuestion();
+    </script>
+</body>
+</html>
